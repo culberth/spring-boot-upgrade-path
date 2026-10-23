@@ -7,15 +7,11 @@ spring:
     timeout-per-shutdown-phase: 20s
   jpa:
     open-in-view: false
-  # Temporary: stay on Jackson 2 through the deprecated spring-boot-jackson2 module
-  # until the Jackson 3 migration lands.
-  jackson2:
+  jackson:
     default-property-inclusion: non_null
-    serialization:
-      write-dates-as-timestamps: false
   http:
     converters:
-      preferred-json-mapper: jackson2
+      preferred-json-mapper: jackson
   security:
     user:
       name: admin

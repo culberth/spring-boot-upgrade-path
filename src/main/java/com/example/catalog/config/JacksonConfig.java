@@ -2,9 +2,10 @@ package com.example.catalog.config;
 
 import java.math.BigDecimal;
 
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import tools.jackson.databind.module.SimpleModule;
+import tools.jackson.databind.ser.std.ToStringSerializer;
 
-import org.springframework.boot.jackson2.autoconfigure.Jackson2ObjectMapperBuilderCustomizer;
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,8 +17,9 @@ public class JacksonConfig {
      * floating point type.
      */
     @Bean
-    Jackson2ObjectMapperBuilderCustomizer decimalsAsStrings() {
-        return builder -> builder.serializerByType(BigDecimal.class, ToStringSerializer.instance);
+    JsonMapperBuilderCustomizer decimalsAsStrings() {
+        return builder -> builder.addModule(
+                new SimpleModule("decimals-as-strings").addSerializer(BigDecimal.class, ToStringSerializer.instance));
     }
 
 }
