@@ -11,13 +11,12 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics;
-import org.springframework.boot.resttestclient.TestRestTemplate;
-import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -25,11 +24,11 @@ import static org.mockito.BDDMockito.given;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @AutoConfigureMetrics
-@AutoConfigureTestRestTemplate
+@AutoConfigureRestTestClient
 class CatalogApplicationTests {
 
     @Autowired
-    private TestRestTemplate rest;
+    private RestTestClient client;
 
     @Autowired
     private BookNotificationListener notifications;
@@ -38,21 +37,29 @@ class CatalogApplicationTests {
     private IsbnLookupClient isbnLookupClient;
 
     @Test
-    @SuppressWarnings("rawtypes")
     void createsBookFromIsbnLookupAndNotifiesAsynchronously() {
         given(this.isbnLookupClient.lookup("9781617294945")).willReturn(Optional
             .of(new IsbnRecord("9781617294945", "Spring in Action", "Craig Walls", "Manning")));
         long notificationsBefore = this.notifications.sentCount();
 
-        ResponseEntity<Map> created = this.rest.withBasicAuth("admin", "admin")
-            .postForEntity("/api/books", Map.of("isbn", "9781617294945", "price", "39.99"), Map.class);
+        String location = this.client.post()
+            .uri("/api/books")
+            .headers(headers -> headers.setBasicAuth("admin", "admin"))
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(Map.of("isbn", "9781617294945", "price", "39.99"))
+            .exchange()
+            .expectStatus().isCreated()
+            .expectBody()
+            .jsonPath("$.title").isEqualTo("Spring in Action")
+            .jsonPath("$.price").isEqualTo("39.99")
+            .returnResult()
+            .getResponseHeaders().getLocation().toString();
 
-        assertThat(created.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertThat(created.getBody()).containsEntry("title", "Spring in Action").containsEntry("price", "39.99");
-
-        ResponseEntity<Map> fetched = this.rest.getForEntity(created.getHeaders().getLocation(), Map.class);
-        assertThat(fetched.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(fetched.getBody()).containsEntry("author", "Craig Walls");
+        this.client.get()
+            .uri(location)
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody().jsonPath("$.author").isEqualTo("Craig Walls");
 
         await().atMost(Duration.ofSeconds(5))
             .untilAsserted(() -> assertThat(this.notifications.sentCount()).isGreaterThan(notificationsBefore));
@@ -60,40 +67,47 @@ class CatalogApplicationTests {
 
     @Test
     void anonymousClientsSeeErrorStatusNotUnauthorized() {
-        assertThat(this.rest.getForEntity("/api/books/not-a-number", String.class).getStatusCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST);
+        this.client.get().uri("/api/books/not-a-number").exchange().expectStatus().isBadRequest();
     }
 
     @Test
     void healthIsPublic() {
-        ResponseEntity<String> health = this.rest.getForEntity("/actuator/health", String.class);
-        assertThat(health.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(health.getBody()).contains("\"status\":\"UP\"");
+        this.client.get()
+            .uri("/actuator/health")
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody().jsonPath("$.status").isEqualTo("UP");
     }
 
     @Test
     void customCatalogStatsEndpointRequiresAuthentication() {
-        assertThat(this.rest.getForEntity("/actuator/catalogstats", String.class).getStatusCode())
-            .isEqualTo(HttpStatus.UNAUTHORIZED);
+        this.client.get().uri("/actuator/catalogstats").exchange().expectStatus().isUnauthorized();
 
-        ResponseEntity<String> stats = this.rest.withBasicAuth("admin", "admin")
-            .getForEntity("/actuator/catalogstats", String.class);
-        assertThat(stats.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(stats.getBody()).contains("\"books\"");
+        this.client.get()
+            .uri("/actuator/catalogstats")
+            .headers(headers -> headers.setBasicAuth("admin", "admin"))
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody().jsonPath("$.books").exists();
     }
 
     @Test
     void prometheusEndpointIsExposed() {
-        ResponseEntity<String> scrape = this.rest.withBasicAuth("admin", "admin")
-            .getForEntity("/actuator/prometheus", String.class);
-        assertThat(scrape.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(scrape.getBody()).contains("jvm_memory_used_bytes");
+        this.client.get()
+            .uri("/actuator/prometheus")
+            .headers(headers -> headers.setBasicAuth("admin", "admin"))
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(String.class).value(body -> assertThat(body).contains("jvm_memory_used_bytes"));
     }
 
     @Test
     void unexposedEndpointsAreNotAvailable() {
-        assertThat(this.rest.withBasicAuth("admin", "admin").getForEntity("/actuator/env", String.class)
-            .getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        this.client.get()
+            .uri("/actuator/env")
+            .headers(headers -> headers.setBasicAuth("admin", "admin"))
+            .exchange()
+            .expectStatus().isNotFound();
     }
 
 }
