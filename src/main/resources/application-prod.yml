@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: ${CATALOG_DB_URL:jdbc:postgresql://localhost:5432/catalog}
+    username: ${CATALOG_DB_USERNAME:catalog}
+    password: ${CATALOG_DB_PASSWORD:catalog}
+  security:
+    user:
+      password: ${CATALOG_ADMIN_PASSWORD}
+
+catalog:
+  isbn-lookup:
+    base-url: ${CATALOG_ISBN_LOOKUP_URL}
+  warehouse:
+    base-url: ${CATALOG_WAREHOUSE_URL}
