@@ -9,7 +9,7 @@ import org.junit.runner.RunWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
-import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.boot.test.json.Jackson2Tester;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -23,12 +23,16 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Written years ago with JUnit 4 and never converted.
  */
 @RunWith(SpringRunner.class)
-@JsonTest
+// Temporary: spring-boot-starter-test-classic brings the Gson and JSON-B tester
+// auto-configurations without those libraries
+@JsonTest(properties = "spring.autoconfigure.exclude="
+        + "org.springframework.boot.gson.autoconfigure.GsonTesterTestAutoConfiguration,"
+        + "org.springframework.boot.jsonb.autoconfigure.JsonbTesterTestAutoConfiguration")
 @Import(JacksonConfig.class)
 public class BookResponseJsonTests {
 
     @Autowired
-    private JacksonTester<BookResponse> json;
+    private Jackson2Tester<BookResponse> json;
 
     @Test
     public void serializesToContract() throws IOException {
