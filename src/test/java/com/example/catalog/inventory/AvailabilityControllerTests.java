@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.BDDMockito.given;
@@ -26,10 +26,10 @@ class AvailabilityControllerTests {
     @Autowired
     private MockMvc mvc;
 
-    @MockBean
+    @MockitoBean
     private BookService bookService;
 
-    @MockBean
+    @MockitoBean
     private WarehouseClient warehouseClient;
 
     @Test
