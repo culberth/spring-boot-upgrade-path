@@ -1,0 +1,15 @@
+# Store text files with LF line endings and check them out with LF on every OS,
+# whatever core.autocrlf is set to. Keeps diffs free of line-ending-only changes.
+* text=auto eol=lf
+
+# Windows batch files need CRLF to run correctly
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary files: never convert or diff as text
+*.docx binary
+*.jar binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
