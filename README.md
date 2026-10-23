@@ -122,5 +122,6 @@ mvn spring-boot:run
 ## Documents
 
 - [Upgrade path, PR by PR](docs/upgrade-path.md): every change in this repository, grouped by hop.
+- [Which version to target](docs/version-recommendation.md): support dates, a comparison of the sample app on every epic (versions, size, startup, memory), and why 4.1 beats stopping at 3.5.
 - [Spring Boot 3.0 to 4.2 upgrade guide (docx)](docs/spring-boot-3-to-4.2-upgrade-guide.docx): what changed in every minor release. The pull requests quote it.
 - [Minimum Java version and release type by Spring Boot version](docs/spring-boot-java-versions.md)
