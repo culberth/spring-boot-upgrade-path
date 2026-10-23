@@ -12,7 +12,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CatalogPropertiesTests {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-        .withUserConfiguration(PropertiesConfiguration.class);
+        .withUserConfiguration(PropertiesConfiguration.class)
+        .withPropertyValues("catalog.warehouse.base-url=https://warehouse.example.com");
 
     @Test
     void bindsNestedIsbnLookupWithDefaults() {
