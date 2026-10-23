@@ -1,6 +1,10 @@
 spring:
   application:
     name: catalog-service
+  lifecycle:
+    # Graceful shutdown is the default from Spring Boot 3.4; keep this below the
+    # orchestrator's termination grace period (Kubernetes default: 30s).
+    timeout-per-shutdown-phase: 20s
   jpa:
     open-in-view: false
   jackson:
@@ -15,9 +19,6 @@ spring:
       name: admin
       password: admin
       roles: ADMIN
-
-server:
-  shutdown: graceful
 
 management:
   endpoints:
