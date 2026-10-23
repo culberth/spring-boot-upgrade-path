@@ -19,7 +19,7 @@ public class IsbnLookupClient {
 
     public IsbnLookupClient(RestTemplateBuilder builder, CatalogProperties properties) {
         CatalogProperties.IsbnLookup isbnLookup = properties.isbnLookup();
-        this.restTemplate = builder.rootUri(isbnLookup.baseUrl().toString())
+        this.restTemplate = builder.baseUri(isbnLookup.baseUrl().toString())
             .connectTimeout(isbnLookup.connectTimeout())
             .readTimeout(isbnLookup.readTimeout())
             .build();
