@@ -12,9 +12,9 @@ Source: *Spring Boot 3.0 to 4.2 upgrade guide* (prepared September 26, 2026), "V
 | 3.5 | Minor, **long-term support** (last 3.x minor) | 17 | Enterprise support until mid-2032 |
 | 4.0 | Major | 17 | Java 25 supported |
 | 4.1 | Minor | 17 | jOOQ users need Java 21 (jOOQ 3.20+ requires it) |
-| 4.2 (M2) | Minor (milestone, not GA) | 17* | |
+| 4.2 (RC1) | Minor (release candidate, not GA) | 17* | The guide was written against M2; the sample repo uses 4.2.0-RC1 |
 
-\* The 4.2 milestones haven't announced any change to the Java baseline. Check this against the final 4.2 release notes.
+\* Neither the 4.2 milestones nor RC1 change the Java baseline. The sample app builds with `--release 17` on 4.2.0-RC1. Check this against the final 4.2 release notes.
 
 ## Support policy
 
