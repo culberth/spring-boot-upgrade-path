@@ -20,7 +20,7 @@ public class BookNotificationListener {
 
     private final AtomicLong sent = new AtomicLong();
 
-    @Async("taskExecutor")
+    @Async("applicationTaskExecutor")
     @EventListener
     public void onBookCreated(BookCreatedEvent event) {
         logger.info("New book in the catalog: {} ({})", event.title(), event.isbn());
