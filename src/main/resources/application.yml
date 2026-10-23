@@ -21,24 +21,25 @@ server:
 
 management:
   endpoints:
-    enabled-by-default: false
+    access:
+      default: none
     web:
       exposure:
         include: health,info,metrics,prometheus,catalogstats
   endpoint:
     health:
-      enabled: true
+      access: read-only
       show-details: when-authorized
       probes:
         enabled: true
     info:
-      enabled: true
+      access: read-only
     metrics:
-      enabled: true
+      access: read-only
     prometheus:
-      enabled: true
+      access: read-only
     catalogstats:
-      enabled: true
+      access: read-only
 
 catalog:
   isbn-lookup:
