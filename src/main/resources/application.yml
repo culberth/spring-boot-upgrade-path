@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: catalog-service
+  lifecycle:
+    # Graceful shutdown is the default from Spring Boot 3.4; keep this below the
+    # orchestrator's termination grace period (Kubernetes default: 30s).
+    timeout-per-shutdown-phase: 20s
+  jpa:
+    open-in-view: false
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+  http:
+    converters:
+      preferred-json-mapper: jackson
+  security:
+    user:
+      name: admin
+      password: admin
+      roles: ADMIN
+
+management:
+  endpoints:
+    access:
+      default: none
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,catalogstats
+  endpoint:
+    health:
+      access: read-only
+      show-details: when-authorized
+      probes:
+        enabled: true
+    info:
+      access: read-only
+    metrics:
+      access: read-only
+    prometheus:
+      access: read-only
+    catalogstats:
+      access: read-only
+
+catalog:
+  isbn-lookup:
+    base-url: http://localhost:9090
+  warehouse:
+    base-url: http://localhost:9091
