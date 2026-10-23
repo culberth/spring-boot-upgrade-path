@@ -81,6 +81,15 @@ class BookControllerTests {
             .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @WithMockUser
+    void createReturnsUnprocessableContentWhenServiceRejectsBook() throws Exception {
+        given(this.bookService.create(any())).willThrow(new InvalidBookException("duplicate"));
+        this.mvc.perform(post("/api/books").contentType(MediaType.APPLICATION_JSON).content(VALID_REQUEST))
+            .andExpect(status().is(422))
+            .andExpect(jsonPath("$.detail").value("duplicate"));
+    }
+
     static BookResponse effectiveJava() {
         return new BookResponse(1L, "9780134685991", "Effective Java", "Joshua Bloch", new BigDecimal("45.99"),
                 LocalDate.of(2018, 1, 6), Instant.parse("2024-05-01T10:15:30Z"));
