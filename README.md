@@ -33,15 +33,41 @@ Within an epic, the order is:
 3. **Bump** the Spring Boot version, plus the smallest change needed to compile and pass the tests again.
 4. **Follow up.** Clear the new deprecations, adopt changed defaults, and optionally adopt new features.
 
+## The hops
+
+| Hop | Epic | Spring Boot | Pull requests | Compare | Headline |
+|---|---|---|---|---|---|
+| baseline | [`epic/3.0`](https://github.com/culberth/spring-boot-upgrade-path/tree/epic/3.0) | 3.0.13 | [#1](https://github.com/culberth/spring-boot-upgrade-path/pull/1) | — | The sample app, written the way 3.0 codebases were |
+| 3.0 → 3.1 | [`epic/3.1`](https://github.com/culberth/spring-boot-upgrade-path/tree/epic/3.1) | 3.1.12 | [#2–#6](https://github.com/culberth/spring-boot-upgrade-path/pulls?q=is%3Apr+label%3Aboot-3.1) | [diff](https://github.com/culberth/spring-boot-upgrade-path/compare/epic/3.0...epic/3.1) | Mockito 5, Security lambda DSL |
+| 3.1 → 3.2 | [`epic/3.2`](https://github.com/culberth/spring-boot-upgrade-path/tree/epic/3.2) | 3.2.12 | [#7–#10](https://github.com/culberth/spring-boot-upgrade-path/pulls?q=is%3Apr+label%3Aboot-3.2) | [diff](https://github.com/culberth/spring-boot-upgrade-path/compare/epic/3.1...epic/3.2) | New jar loader breaks the Docker image; `RestClient` |
+| 3.2 → 3.3 | [`epic/3.3`](https://github.com/culberth/spring-boot-upgrade-path/tree/epic/3.3) | 3.3.13 | [#11–#15](https://github.com/culberth/spring-boot-upgrade-path/pulls?q=is%3Apr+label%3Aboot-3.3) | [diff](https://github.com/culberth/spring-boot-upgrade-path/compare/epic/3.2...epic/3.3) | Flyway 10 modules, `@Endpoint`, tools jar mode |
+| 3.3 → 3.4 | [`epic/3.4`](https://github.com/culberth/spring-boot-upgrade-path/tree/epic/3.4) | 3.4.13 | [#16–#22](https://github.com/culberth/spring-boot-upgrade-path/pulls?q=is%3Apr+label%3Aboot-3.4) | [diff](https://github.com/culberth/spring-boot-upgrade-path/compare/epic/3.3...epic/3.4) | `@MockitoBean`, actuator access model, nested `@Valid` |
+| 3.4 → 3.5 | [`epic/3.5`](https://github.com/culberth/spring-boot-upgrade-path/tree/epic/3.5) | 3.5.16 | [#23–#27](https://github.com/culberth/spring-boot-upgrade-path/pulls?q=is%3Apr+label%3Aboot-3.5) | [diff](https://github.com/culberth/spring-boot-upgrade-path/compare/epic/3.4...epic/3.5) | `applicationTaskExecutor`, 4.0 prep |
+| 3.5 → 4.0 | [`epic/4.0`](https://github.com/culberth/spring-boot-upgrade-path/tree/epic/4.0) | 4.0.9 | [#28–#33](https://github.com/culberth/spring-boot-upgrade-path/pulls?q=is%3Apr+label%3Aboot-4.0) | [diff](https://github.com/culberth/spring-boot-upgrade-path/compare/epic/3.5...epic/4.0) | Modular Boot, Jackson 3, JUnit 6, test auto-config |
+| 4.0 → 4.1 | [`epic/4.1`](https://github.com/culberth/spring-boot-upgrade-path/tree/epic/4.1) | 4.1.2 | [#34–#36](https://github.com/culberth/spring-boot-upgrade-path/pulls?q=is%3Apr+label%3Aboot-4.1) | [diff](https://github.com/culberth/spring-boot-upgrade-path/compare/epic/4.0...epic/4.1) | One-line bump; `baseUri` |
+| 4.1 → 4.2 | [`epic/4.2`](https://github.com/culberth/spring-boot-upgrade-path/tree/epic/4.2) | 4.2.0-RC1 | [#37–#40](https://github.com/culberth/spring-boot-upgrade-path/pulls?q=is%3Apr+label%3Aboot-4.2) | [diff](https://github.com/culberth/spring-boot-upgrade-path/compare/epic/4.1...epic/4.2) | `RestTemplate` → `RestClient`, `RestTestClient` |
+
+**[docs/upgrade-path.md](docs/upgrade-path.md)** lists every pull request with its type and the lesson it teaches. It also covers the problems only a runtime check caught, and the ones that fail silently.
+
+> 4.2 isn't GA yet. `epic/4.2` targets 4.2.0-RC1, which shipped after the upgrade guide (written against M2). Recheck it against the final 4.2.0 release notes.
+
 ## How to compare
 
-- **A whole hop:** compare two epics, for example `epic/3.4...epic/3.5`.
-- **A single change:** open that change's pull request, filtered by the `boot-<version>` label.
-- **Everything from 3.0 to 4.2:** compare `epic/3.0...epic/4.2`.
+- **A whole hop:** compare two epics, for example [`epic/3.4...epic/3.5`](https://github.com/culberth/spring-boot-upgrade-path/compare/epic/3.4...epic/3.5).
+- **A single change:** open that change's pull request, or filter pull requests by the `boot-<version>` label. Labels such as `breaking-change`, `deprecation` and `prepare` filter by kind of change.
+- **Everything from 3.0 to 4.2:** compare [`epic/3.0...epic/4.2`](https://github.com/culberth/spring-boot-upgrade-path/compare/epic/3.0...epic/4.2).
 
 ```bash
-git diff epic/3.4 epic/3.5
+git diff origin/epic/3.4 origin/epic/3.5
 ```
+
+## How each hop was verified
+
+Every pull request was checked locally before merging, and CI (GitHub Actions, Java 17) builds every pull request and epic:
+
+1. `mvn verify` with `-Xlint:deprecation`. Each epic ends with **no deprecation warnings**.
+2. `spring-boot-properties-migrator`, added temporarily, to find renamed or removed properties. It's never committed.
+3. On packaging and database hops, the runtime artifact: `docker build` plus `docker run` against `/actuator/health`, and the `prod` profile against a real PostgreSQL 16.
 
 ## The sample application
 
@@ -53,7 +79,7 @@ git diff epic/3.4 epic/3.5
 | Data | Spring Data JPA, Flyway, H2 (default) and PostgreSQL (`prod` profile) |
 | Security | Spring Security with HTTP Basic and a `SecurityFilterChain` |
 | Actuator | Health, info, metrics, Prometheus, and a custom `catalogstats` endpoint |
-| HTTP clients | `RestTemplate` for ISBN lookup (and `RestClient` from 3.2 on) |
+| HTTP clients | `RestTemplate` for ISBN lookup until 4.2, then `RestClient`; `RestClient` for warehouse stock from 3.2 on |
 | JSON | Jackson customization and a golden-file JSON contract test |
 | Async | `@Async` event listener |
 | Config | Validated, nested `@ConfigurationProperties` records |
@@ -68,5 +94,6 @@ mvn spring-boot:run
 
 ## Documents
 
-- [Spring Boot 3.0 to 4.2 upgrade guide (docx)](docs/spring-boot-3-to-4.2-upgrade-guide.docx): what changed in every minor release.
+- [Upgrade path, PR by PR](docs/upgrade-path.md): every change in this repository, grouped by hop.
+- [Spring Boot 3.0 to 4.2 upgrade guide (docx)](docs/spring-boot-3-to-4.2-upgrade-guide.docx): what changed in every minor release. The pull requests quote it.
 - [Minimum Java version and release type by Spring Boot version](docs/spring-boot-java-versions.md)
