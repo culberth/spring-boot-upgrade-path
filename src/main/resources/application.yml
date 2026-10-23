@@ -43,3 +43,5 @@ management:
 catalog:
   isbn-lookup:
     base-url: http://localhost:9090
+  warehouse:
+    base-url: http://localhost:9091

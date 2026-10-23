@@ -10,3 +10,5 @@ spring:
 catalog:
   isbn-lookup:
     base-url: ${CATALOG_ISBN_LOOKUP_URL}
+  warehouse:
+    base-url: ${CATALOG_WAREHOUSE_URL}
