@@ -23,11 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Written years ago with JUnit 4 and never converted.
  */
 @RunWith(SpringRunner.class)
-// Temporary: spring-boot-starter-test-classic brings the Gson and JSON-B tester
-// auto-configurations without those libraries
-@JsonTest(properties = "spring.autoconfigure.exclude="
-        + "org.springframework.boot.gson.autoconfigure.GsonTesterTestAutoConfiguration,"
-        + "org.springframework.boot.jsonb.autoconfigure.JsonbTesterTestAutoConfiguration")
+@JsonTest
 @Import(JacksonConfig.class)
 public class BookResponseJsonTests {
 
