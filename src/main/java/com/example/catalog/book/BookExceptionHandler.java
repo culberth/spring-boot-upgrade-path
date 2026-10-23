@@ -15,7 +15,7 @@ class BookExceptionHandler {
 
     @ExceptionHandler(InvalidBookException.class)
     ProblemDetail handleInvalid(InvalidBookException ex) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
     }
 
 }
