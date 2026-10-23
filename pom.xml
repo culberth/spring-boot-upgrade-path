@@ -116,23 +116,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <!-- VM deployments: mvn package -Psystemd builds a fully executable jar that can be
-             installed as a systemd/init.d service. Not compatible with the layered Dockerfile. -->
-        <profile>
-            <id>systemd</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
-                        <configuration>
-                            <executable>true</executable>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
