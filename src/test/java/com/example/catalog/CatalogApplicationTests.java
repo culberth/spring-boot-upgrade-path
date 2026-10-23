@@ -57,6 +57,12 @@ class CatalogApplicationTests {
     }
 
     @Test
+    void anonymousClientsSeeErrorStatusNotUnauthorized() {
+        assertThat(this.rest.getForEntity("/api/books/not-a-number", String.class).getStatusCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
     void healthIsPublic() {
         ResponseEntity<String> health = this.rest.getForEntity("/actuator/health", String.class);
         assertThat(health.getStatusCode()).isEqualTo(HttpStatus.OK);
