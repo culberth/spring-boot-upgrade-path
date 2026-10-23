@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: catalog-service
+  jpa:
+    open-in-view: false
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+  mvc:
+    converters:
+      preferred-json-mapper: jackson
+  security:
+    user:
+      name: admin
+      password: admin
+      roles: ADMIN
+
+server:
+  shutdown: graceful
+
+management:
+  endpoints:
+    enabled-by-default: false
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,catalogstats
+  endpoint:
+    health:
+      enabled: true
+      show-details: when-authorized
+      probes:
+        enabled: true
+    info:
+      enabled: true
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+    catalogstats:
+      enabled: true
+
+catalog:
+  isbn-lookup:
+    base-url: http://localhost:9090
